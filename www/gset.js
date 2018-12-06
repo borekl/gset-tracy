@@ -98,7 +98,6 @@ $(document).ready(function()
   var 
     html,
     key,
-    entries = 0,
     jq_a,
     loaded;         // count of already loaded thumbnails
 
@@ -112,10 +111,7 @@ $(document).ready(function()
 
   //--- count number of galleries
   
-    for (var x in data.dirs) {
-      entries++;
-    }
-    loaded = entries;
+    loaded = data.dirs_order.length;
 
   //--- iterate over galleries, create DOM elements
 
