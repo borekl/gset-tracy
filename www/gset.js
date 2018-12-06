@@ -122,7 +122,7 @@ $(document).ready(function()
     data.dirs_order.forEach(function(key) {  
       
       // create a thumbnail
-      html = html_thumb(key, data.dirs[key].info);
+      html = html_thumb(key, data.dirs[key]);
       jq_a = $(html);
       
       // setup the fade-out animation of the span.info
@@ -143,7 +143,7 @@ $(document).ready(function()
       
       // create the actual pictures
       if(jq_a.children('div').visible(true)) {
-        html = html_thumb_img(key, data.dirs[key].info);
+        html = html_thumb_img(key, data.dirs[key]);
         jq_a.children('div').append(html);
         loaded--;
       } else {
@@ -161,7 +161,7 @@ $(document).ready(function()
         if($(this).visible(true)) {
           var k = $(this).attr('data-key');
           $(this).removeClass('notloaded');
-          $(this).append(html_thumb_img(k, data.dirs[k].info));
+          $(this).append(html_thumb_img(k, data.dirs[k]));
           loaded--;
         }
       });
