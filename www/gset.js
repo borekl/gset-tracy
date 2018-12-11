@@ -58,18 +58,26 @@ function throttle(fn, threshhold, scope) {
 
  function html_thumb(id, info)
 {
-  var html = '';
+  //--- produce info text 'N images M videos'
 
-  html = '<a class="th" href="' + id  + '/">';
-  html += '<div class="th">';
-  html += '<span class="cap">' + info.date + '</span>';
-  html += '<span class="info">';
-  if(info.images) { html += pl(info.images, 'fotka'); }
-  if(info.videos && info.images) { html += '<br>'; }
-  if(info.videos) { html += pl(info.videos, 'video'); }
-  html += '</span></div></a>';
+  var imginfo = function() {
+    var re = '';
 
-  return html;
+    if(info.images) { re += pl(info.images, 'fotka'); }
+    if(info.images && info.videos) { re += '<br>'; }
+    if(info.videos) { re += pl(info.videos, 'video'); }
+
+    return re;
+  }
+
+  //--- return the thumbnail
+
+  return $('<a/>', { class: 'th', href: id + '/' }).append(
+    $('<div/>', { class: 'th' }).append(
+      $('<span/>', { class: 'cap' }).text(info.date),
+      $('<span/>', { class: 'info' }).html(imginfo())
+    )
+  );
 }
 
 
@@ -79,15 +87,16 @@ function throttle(fn, threshhold, scope) {
 
  function html_thumb_img(id, info)
 {
-  var attrs = [];
+  var img = $('<img>');
 
-  if("thumb" in info) {
-    attrs.push('src="' + info.thumb.src + '"');
-    if("srcset" in info.thumb) {
-      attrs.push('srcset="' + info.thumb.srcset + '"');
+  if('thumb' in info) {
+    img.attr('src', info.thumb.src);
+    if('srcset' in info.thumb) {
+      img.attr('srcset', info.thumb.srcset);
     }
   }
-  return '<img ' + attrs.join(' ') + '>';
+
+  return img
 }
 
 
@@ -118,9 +127,9 @@ $(document).ready(function()
     data.dirs_order.forEach(function(key) {
 
       // create a thumbnail
-      html = html_thumb(key, data.dirs[key]);
-      jq_a = $(html);
-      
+      // html = html_thumb(key, data.dirs[key]);
+      jq_a = html_thumb(key, data.dirs[key]);
+
       // setup the fade-out animation of the span.info
       jq_a.children('div')
       .on('mouseenter', function(evt) {
@@ -139,8 +148,9 @@ $(document).ready(function()
 
       // create the actual pictures
       if(jq_a.children('div').visible(true)) {
-        html = html_thumb_img(key, data.dirs[key]);
-        jq_a.children('div').append(html);
+        jq_a.children('div').append(
+          html_thumb_img(key, data.dirs[key])
+        );
         loaded--;
       } else {
         jq_a.children('div').addClass('notloaded').attr('data-key', key);
