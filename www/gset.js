@@ -35,19 +35,19 @@ function throttle(fn, threshhold, scope) {
  function pl(n, s)
 {
   var pl;
-  
+
   if(s == 'fotka') {
     if(n == 1) { pl = s; }
     else if(n > 1 && n < 5) { pl = 'fotky'; }
     else { pl = 'fotek'; }
   }
-  
+
   if(s == 'video') {
     if(n == 1) { pl = 'video'; }
     else if(n > 1 && n < 5) { pl = 'videa'; }
     else { pl = 'videí'; }
   }
-  
+
   return n + '&nbsp;' + pl;
 }
 
@@ -95,28 +95,28 @@ function throttle(fn, threshhold, scope) {
 
 $(document).ready(function()
 {
-  var 
+  var
     html,
     key,
     jq_a,
     loaded;         // count of already loaded thumbnails
 
   //--- remove no javascript notice
-  	
+
   $('p#nojava').remove();
 
   //--- get set information from JSON file
-  
+
   $.get("gset.json", function(data) {
 
   //--- count number of galleries
-  
+
     loaded = data.dirs_order.length;
 
   //--- iterate over galleries, create DOM elements
 
-    data.dirs_order.forEach(function(key) {  
-      
+    data.dirs_order.forEach(function(key) {
+
       // create a thumbnail
       html = html_thumb(key, data.dirs[key]);
       jq_a = $(html);
@@ -136,7 +136,7 @@ $(document).ready(function()
 
       // add thumbnail to DOM
       $('div.main').append(jq_a);
-      
+
       // create the actual pictures
       if(jq_a.children('div').visible(true)) {
         html = html_thumb_img(key, data.dirs[key]);
@@ -151,7 +151,7 @@ $(document).ready(function()
     // on resize/scroll events we go through every picture with .notloaded,
     // check its visibility and if it is visible, we load it and remove .notloaded;
     // if "loaded" counter reaches 0, we unbind the resize/scroll handler.
-    
+
     var on_scroll = throttle(function() {
       $('div.main').find('.notloaded').each(function() {
         if($(this).visible(true)) {
@@ -166,7 +166,7 @@ $(document).ready(function()
         $(window).off('resize');
       }
     }, 200);
-		
+
     $(window).on('scroll', on_scroll);
     $(window).on('resize', on_scroll);
   });
