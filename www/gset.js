@@ -1,3 +1,10 @@
+(function() {
+
+//--- global variables
+
+var filter_tags = [];
+
+
 /*===========================================================================*
   Event debouncing, taken from:
   https://remysharp.com/2010/07/21/throttling-function-calls
@@ -53,6 +60,26 @@ function throttle(fn, threshhold, scope) {
 
 
 /*===========================================================================*
+  Return intersection of arrays 'tags' and global 'filter_tags'. When the
+  'filter_tags' is an empty array, then the result of this function is always
+  true.
+ *===========================================================================*/
+
+function check_tags(tags)
+{
+  var re = false;
+
+  if(filter_tags.length == 0) { return true; }
+
+  filter_tags.forEach(function(tag) {
+    if(tags.indexOf(tag) != -1) { re = true; }
+  });
+
+  return re;
+}
+
+
+/*===========================================================================*
   HTML for the thumbnail sans the image itself.
  *===========================================================================*/
 
@@ -72,12 +99,22 @@ function throttle(fn, threshhold, scope) {
 
   //--- return the thumbnail
 
-  return $('<a/>', { class: 'th', href: id + '/' }).append(
+  var thumb = $('<a/>', { class: 'th', href: id + '/' }).append(
     $('<div/>', { class: 'th' }).append(
       $('<span/>', { class: 'cap' }).text(info.date),
       $('<span/>', { class: 'info' }).html(imginfo())
     )
   );
+
+  //--- check filters
+
+  if('tags' in info && !check_tags(info.tags)) {
+    thumb.css('display', 'none');
+  }
+
+  //--- finish
+
+  return thumb
 }
 
 
@@ -122,6 +159,16 @@ $(document).ready(function()
 
     loaded = data.dirs_order.length;
 
+  //--- get default filtering tags
+
+    var get_filter_tags = function() {
+      filter_tags = [];
+      $('div.filter .filter-item.selected').each(function() {
+        filter_tags.push($(this).attr('id'));
+      });
+    }
+    get_filter_tags();
+
   //--- iterate over galleries, create DOM elements
 
     data.dirs_order.forEach(function(key) {
@@ -150,7 +197,7 @@ $(document).ready(function()
       if(jq_a.children('div').visible(true)) {
         jq_a.children('div').append(
           html_thumb_img(key, data.dirs[key])
-        );
+        ).attr('data-key', key);
         loaded--;
       } else {
         jq_a.children('div').addClass('notloaded').attr('data-key', key);
@@ -179,5 +226,33 @@ $(document).ready(function()
 
     $(window).on('scroll', on_scroll);
     $(window).on('resize', on_scroll);
+
+    //--- filtering, WORK IN PROGRESS
+    // filtering of the galleries by user selectable terms
+
+    var do_filtering = function() {
+      $('a.th').each(function() {
+        var key = $(this).children('div').attr('data-key');
+        if(check_tags(data.dirs[key].tags)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    }
+
+    $('div.filter').on('click', function(evt) {
+      var sel = $(evt.target).hasClass('selected');
+      if(!(filter_tags.length == 1 && sel)) {
+        $(evt.target).toggleClass('selected');
+        get_filter_tags();
+        do_filtering();
+        $(window).trigger('scroll');
+      }
+    });
+
   });
 });
+
+
+})();
