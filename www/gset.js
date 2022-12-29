@@ -142,8 +142,6 @@ function check_tags(tags)
 $(document).ready(function()
 {
   var
-    html,
-    key,
     jq_a,
     loaded;         // count of already loaded thumbnails
 
