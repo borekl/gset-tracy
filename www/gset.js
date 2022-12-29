@@ -1,12 +1,10 @@
 (function() {
 
-/*===========================================================================*
-  Event debouncing, taken from:
-  https://remysharp.com/2010/07/21/throttling-function-calls
- *===========================================================================*/
-
-
-function throttle(fn, threshhold, scope) {
+//------------------------------------------------------------------------------
+// Event debouncing, taken from:
+// https://remysharp.com/2010/07/21/throttling-function-calls
+function throttle(fn, threshhold, scope)
+{
   threshhold || (threshhold = 250);
   var last,
       deferTimer;
@@ -30,11 +28,9 @@ function throttle(fn, threshhold, scope) {
 }
 
 
-/*===========================================================================*
-  Pluralize nouns.
- *===========================================================================*/
-
- function pl(n, s)
+//------------------------------------------------------------------------------
+// Pluralize nouns.
+function pl(n, s)
 {
   var pl;
 
@@ -50,92 +46,78 @@ function throttle(fn, threshhold, scope) {
     else { pl = 'videí'; }
   }
 
-  return n + '&nbsp;' + pl;
+  return n + '\u00a0' + pl;
 }
 
-
-/*===========================================================================*
-  HTML for the thumbnail sans the image itself.
- *===========================================================================*/
-
- function html_thumb(id, info)
+//------------------------------------------------------------------------------
+// generate and return single thumbnail element tree
+function thumbnail(id, info)
 {
-  //--- produce info text 'N images M videos'
+  // caption, usually contains date
+  let cap = document.createElement('span');
+  cap.classList.add('cap');
+  cap.textContent = info.date;
 
-  var imginfo = function() {
-    var re = '';
+  // this says how many photos/videos gallery has
+  let infoContent = [];
 
-    if(info.images) { re += pl(info.images, 'fotka'); }
-    if(info.images && info.videos) { re += '<br>'; }
-    if(info.videos) { re += pl(info.videos, 'video'); }
+  if(info.images)
+    infoContent.push(document.createTextNode(pl(info.images, 'fotka')));
+  if(info.images && info.videos)
+    infoContent.push(document.createElement('br'));
+  if(info.videos)
+    infoContent.push(document.createTextNode(pl(info.videos, 'video')));
 
-    return re;
-  }
+  let imgInfo = document.createElement('span');
+  imgInfo.classList.add('info');
+  imgInfo.append(...infoContent);
 
-  //--- return the thumbnail
+  // thumbnail image
+  let image = document.createElement('img');
+  if('thumb' in info) image.setAttribute('src', info.thumb.src);
+  if('srcset' in info.thumb) image.setAttribute('srcset', info.thumb.srcset);
 
-  var thumb = $('<a/>', { class: 'th', href: id + '/' }).append(
-    $('<div/>', { class: 'th' }).append(
-      $('<span/>', { class: 'cap' }).text(info.date),
-      $('<span/>', { class: 'info' }).html(imginfo())
-    )
-  );
+  // encompassing DIV element that holds the text content and the image
+  let thumb = document.createElement('div');
+  thumb.classList.add('th');
+  thumb.append(cap, imgInfo, image);
 
-  //--- finish
+  // wrapping A element
+  let a = document.createElement('a');
+  a.setAttribute('href', id + '/');
+  a.classList.add('th');
+  a.append(thumb);
 
-  return thumb
+  return a;
 }
-
-
-/*===========================================================================*
-  HTML for the thumbnail image.
- *===========================================================================*/
-
- function html_thumb_img(id, info)
-{
-  var img = $('<img>');
-
-  if('thumb' in info) {
-    img.attr('src', info.thumb.src);
-    if('srcset' in info.thumb) {
-      img.attr('srcset', info.thumb.srcset);
-    }
-  }
-
-  return img
-}
-
 
 /*=========================================================================*/
 
-$(document).ready(function()
-{
-  var
-    jq_a,
-    loaded;         // count of already loaded thumbnails
+document.addEventListener("DOMContentLoaded", function() {
 
-  //--- remove no javascript notice
+  var jq_a;
 
-  $('p#nojava').remove();
+  // remove no javascript notice
+  document.getElementById("nojava").remove();
 
-  //--- get set information from JSON file
+  // load set JSON file
+  fetch("gset.json")
+  .then(response => response.json())
+  .then(data => {
 
-  $.get("gset.json", function(data) {
+    // count number of galleries
+    let loaded = data.dirs_order.length;
 
-  //--- count number of galleries
-
-    loaded = data.dirs_order.length;
-
-  //--- iterate over galleries, create DOM elements
-
-    data.dirs_order.forEach(function(key) {
+    // iterate over galleries, create DOM elements
+    data.dirs_order.forEach(key => {
 
       // create a thumbnail
-      // html = html_thumb(key, data.dirs[key]);
-      jq_a = html_thumb(key, data.dirs[key]);
+      let thumb = thumbnail(key, data.dirs[key]);
+      thumb.style.display = 'inline';
+      document.getElementsByClassName('main')[0].append(thumb);
 
       // setup the fade-out animation of the span.info
-      jq_a.children('div')
+      /*jq_a.children('div')
       .on('mouseenter', function(evt) {
         $(this).children('span.info')
         .stop().css({'display':'inline', 'opacity':1});
@@ -145,20 +127,20 @@ $(document).ready(function()
         .animate({'opacity': 0}, 300, 'linear', function() {
           $(this).css({'display':'none', 'opacity': 1});
         });
-      });
+      });*/
 
       // add thumbnail to DOM
-      $('div.main').append(jq_a);
+      //$('div.main').append(jq_a);
 
       // create the actual pictures
-      if(jq_a.children('div').visible(true)) {
+      /*if(jq_a.children('div').visible(true)) {
         jq_a.children('div').append(
           html_thumb_img(key, data.dirs[key])
         ).attr('data-key', key);
         loaded--;
       } else {
         jq_a.children('div').addClass('notloaded').attr('data-key', key);
-      }
+      }*/
     });
 
     //--- define callback for loading the pictures
