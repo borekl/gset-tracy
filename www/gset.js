@@ -1,10 +1,5 @@
 (function() {
 
-//--- global variables
-
-var filter_tags = [];
-
-
 /*===========================================================================*
   Event debouncing, taken from:
   https://remysharp.com/2010/07/21/throttling-function-calls
@@ -60,26 +55,6 @@ function throttle(fn, threshhold, scope) {
 
 
 /*===========================================================================*
-  Return intersection of arrays 'tags' and global 'filter_tags'. When the
-  'filter_tags' is an empty array, then the result of this function is always
-  true.
- *===========================================================================*/
-
-function check_tags(tags)
-{
-  var re = false;
-
-  if(filter_tags.length == 0) { return true; }
-
-  filter_tags.forEach(function(tag) {
-    if(tags.indexOf(tag) != -1) { re = true; }
-  });
-
-  return re;
-}
-
-
-/*===========================================================================*
   HTML for the thumbnail sans the image itself.
  *===========================================================================*/
 
@@ -105,12 +80,6 @@ function check_tags(tags)
       $('<span/>', { class: 'info' }).html(imginfo())
     )
   );
-
-  //--- check filters
-
-  if('tags' in info && !check_tags(info.tags)) {
-    thumb.css('display', 'none');
-  }
 
   //--- finish
 
