@@ -159,16 +159,6 @@ $(document).ready(function()
 
     loaded = data.dirs_order.length;
 
-  //--- get default filtering tags
-
-    var get_filter_tags = function() {
-      filter_tags = [];
-      $('div.filter .filter-item.selected').each(function() {
-        filter_tags.push($(this).attr('id'));
-      });
-    }
-    get_filter_tags();
-
   //--- iterate over galleries, create DOM elements
 
     data.dirs_order.forEach(function(key) {
@@ -226,30 +216,6 @@ $(document).ready(function()
 
     $(window).on('scroll', on_scroll);
     $(window).on('resize', on_scroll);
-
-    //--- filtering, WORK IN PROGRESS
-    // filtering of the galleries by user selectable terms
-
-    var do_filtering = function() {
-      $('a.th').each(function() {
-        var key = $(this).children('div').attr('data-key');
-        if(check_tags(data.dirs[key].tags)) {
-          $(this).show();
-        } else {
-          $(this).hide();
-        }
-      });
-    }
-
-    $('div.filter').on('click', function(evt) {
-      var sel = $(evt.target).hasClass('selected');
-      if(!(filter_tags.length == 1 && sel)) {
-        $(evt.target).toggleClass('selected');
-        get_filter_tags();
-        do_filtering();
-        $(window).trigger('scroll');
-      }
-    });
 
   });
 });
