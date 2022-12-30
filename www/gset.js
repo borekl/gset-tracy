@@ -1,34 +1,6 @@
 (function() {
 
 //------------------------------------------------------------------------------
-// Event debouncing, taken from:
-// https://remysharp.com/2010/07/21/throttling-function-calls
-function throttle(fn, threshhold, scope)
-{
-  threshhold || (threshhold = 250);
-  var last,
-      deferTimer;
-  return function () {
-    var context = scope || this;
-
-    var now = +new Date,
-        args = arguments;
-    if (last && now < last + threshhold) {
-      // hold on to it
-      clearTimeout(deferTimer);
-      deferTimer = setTimeout(function () {
-        last = now;
-        fn.apply(context, args);
-      }, threshhold);
-    } else {
-      last = now;
-      fn.apply(context, args);
-    }
-  };
-}
-
-
-//------------------------------------------------------------------------------
 // Pluralize nouns.
 function pl(n, s)
 {
@@ -72,10 +44,13 @@ function thumbnail(id, info)
   imgInfo.classList.add('info');
   imgInfo.append(...infoContent);
 
-  // thumbnail image
+  // thumbnail image, we are adding "ghost" src/srcset attributes to be
+  // copied to real ones upon becoming visible (ie. lazy loading)
   let image = document.createElement('img');
-  if('thumb' in info) image.setAttribute('src', info.thumb.src);
-  if('srcset' in info.thumb) image.setAttribute('srcset', info.thumb.srcset);
+  if('thumb' in info)
+    image.setAttribute('data-src', info.thumb.src);
+  if('srcset' in info.thumb)
+    image.setAttribute('data-srcset', info.thumb.srcset);
 
   // encompassing DIV element that holds the text content and the image
   let thumb = document.createElement('div');
@@ -95,7 +70,8 @@ function thumbnail(id, info)
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  var jq_a;
+  // container for the thumbnails
+  var main = document.getElementsByClassName('main')[0];
 
   // remove no javascript notice
   document.getElementById("nojava").remove();
@@ -108,50 +84,29 @@ document.addEventListener("DOMContentLoaded", function() {
     // count number of galleries
     let loaded = data.dirs_order.length;
 
-    // iterate over galleries, create DOM elements
+    // create DOM elements for thumbnails
     data.dirs_order.forEach(key => {
-
-      // create a thumbnail
       let thumb = thumbnail(key, data.dirs[key]);
       document.getElementsByClassName('main')[0].append(thumb);
-
-      // add thumbnail to DOM
-      //$('div.main').append(jq_a);
-
-      // create the actual pictures
-      /*if(jq_a.children('div').visible(true)) {
-        jq_a.children('div').append(
-          html_thumb_img(key, data.dirs[key])
-        ).attr('data-key', key);
-        loaded--;
-      } else {
-        jq_a.children('div').addClass('notloaded').attr('data-key', key);
-      }*/
     });
 
-    //--- define callback for loading the pictures
-    // on resize/scroll events we go through every picture with .notloaded,
-    // check its visibility and if it is visible, we load it and remove .notloaded;
-    // if "loaded" counter reaches 0, we unbind the resize/scroll handler.
-
-    var on_scroll = throttle(function() {
-      $('div.main').find('.notloaded').each(function() {
-        if($(this).visible(true)) {
-          var k = $(this).attr('data-key');
-          $(this).removeClass('notloaded');
-          $(this).append(html_thumb_img(k, data.dirs[k]));
-          loaded--;
+    // set up intersection observer instance and lazy loading code
+    let observer = new IntersectionObserver((entries, o) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          let t = entry.target;
+          o.unobserve(t);
+          if(t.hasAttribute('data-srcset'))
+            t.setAttribute('srcset', t.getAttribute('data-srcset'));
+          if(t.hasAttribute('data-src'))
+            t.setAttribute('src', t.getAttribute('data-src'));
         }
-      });
-      if(loaded == 0) {
-        $(window).off('scroll');
-        $(window).off('resize');
-      }
-    }, 200);
+      })
+    });
 
-    $(window).on('scroll', on_scroll);
-    $(window).on('resize', on_scroll);
-
+    // set images for observing
+    let images = main.querySelectorAll('img');
+    images.forEach(i => observer.observe(i));
   });
 });
 
