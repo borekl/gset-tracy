@@ -1,0 +1,47 @@
+/*--- the overarching DIV for thumbnails (it is still wrapped in A) */
+div.th {
+  width: 128px;
+  height: 128px;
+  overflow: hidden;
+  float: left;
+  position : relative;
+  margin : 4px;
+  border-radius : 8px;
+}
+
+/*--- caption, this normally holds a date */
+span.cap {
+  position: absolute;
+  width: 100%;
+  bottom : 0.5em;
+  text-align : center;
+  font-weight : 600;
+  font-size : 8pt;
+  text-shadow : 1px 1px 1px rgba(0,0,0,.7);
+}
+
+/*--- this displays number photos/videos in the gallery, only displayed on */
+/*--- mouse-over */
+span.info {
+  position : absolute;
+  width : 100%;
+  top : 0.5em;
+  text-align : center;
+  font-weight : 600;
+  font-size : 8pt;
+  text-shadow : 1px 1px 1px rgba(0,0,0,.7);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+a:hover span.info {
+  opacity: 1;
+  transition: none;
+}
+
+/*--- display the span.info on thumbnail mouse-over and underline the */
+/*--- caption so the user has some idea the thumbnail is a clickable link */
+a:hover span.cap {
+  text-decoration : underline;
+}
+

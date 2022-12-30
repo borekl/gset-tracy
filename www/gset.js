@@ -113,21 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // create a thumbnail
       let thumb = thumbnail(key, data.dirs[key]);
-      thumb.style.display = 'inline';
       document.getElementsByClassName('main')[0].append(thumb);
-
-      // setup the fade-out animation of the span.info
-      /*jq_a.children('div')
-      .on('mouseenter', function(evt) {
-        $(this).children('span.info')
-        .stop().css({'display':'inline', 'opacity':1});
-      })
-      .on('mouseleave', function(evt) {
-        $(this).children('span.info')
-        .animate({'opacity': 0}, 300, 'linear', function() {
-          $(this).css({'display':'none', 'opacity': 1});
-        });
-      });*/
 
       // add thumbnail to DOM
       //$('div.main').append(jq_a);
