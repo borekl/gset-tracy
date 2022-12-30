@@ -4,7 +4,7 @@
 // Pluralize nouns.
 function pl(n, s)
 {
-  var pl;
+  let pl;
 
   if(s == 'fotka') {
     if(n == 1) { pl = s; }
@@ -71,7 +71,7 @@ function thumbnail(id, info)
 document.addEventListener("DOMContentLoaded", function() {
 
   // container for the thumbnails
-  var main = document.getElementsByClassName('main')[0];
+  let main = document.getElementsByClassName('main')[0];
 
   // remove no javascript notice
   document.getElementById("nojava").remove();
@@ -80,9 +80,6 @@ document.addEventListener("DOMContentLoaded", function() {
   fetch("gset.json")
   .then(response => response.json())
   .then(data => {
-
-    // count number of galleries
-    let loaded = data.dirs_order.length;
 
     // create DOM elements for thumbnails
     data.dirs_order.forEach(key => {
