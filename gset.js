@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let observer = new IntersectionObserver((entries, o) => {
       entries.forEach(entry => {
         if(entry.isIntersecting) {
-          let t = entry.target;
+          let t = entry.target.children[2];
           o.unobserve(t);
           if(t.hasAttribute('data-srcset'))
             t.setAttribute('srcset', t.getAttribute('data-srcset'));
@@ -102,8 +102,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // set images for observing
-    let images = main.querySelectorAll('img');
-    images.forEach(i => observer.observe(i));
+    let thumbs = main.querySelectorAll('div.th');
+    thumbs.forEach(t => observer.observe(t));
   });
 });
 
