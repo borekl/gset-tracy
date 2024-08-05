@@ -44,13 +44,13 @@ function thumbnail(id, info)
   imgInfo.classList.add('info');
   imgInfo.append(...infoContent);
 
-  // thumbnail image, we are adding "ghost" src/srcset attributes to be
+  // thumbnail image, we are adding "ghost" src attributes to be
   // copied to real ones upon becoming visible (ie. lazy loading)
   let image = document.createElement('img');
+  image.setAttribute('width', 128);
+  image.setAttribute('height', 128);
   if('thumb' in info)
     image.setAttribute('data-src', info.thumb.src);
-  if('srcset' in info.thumb)
-    image.setAttribute('data-srcset', info.thumb.srcset);
 
   // encompassing DIV element that holds the text content and the image
   let thumb = document.createElement('div');
@@ -93,8 +93,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if(entry.isIntersecting) {
           let t = entry.target.children[2];
           o.unobserve(t);
-          if(t.hasAttribute('data-srcset'))
-            t.setAttribute('srcset', t.getAttribute('data-srcset'));
           if(t.hasAttribute('data-src'))
             t.setAttribute('src', t.getAttribute('data-src'));
         }
