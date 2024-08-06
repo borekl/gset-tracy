@@ -44,13 +44,12 @@ function thumbnail(id, info)
   imgInfo.classList.add('info');
   imgInfo.append(...infoContent);
 
-  // thumbnail image, we are adding "ghost" src attributes to be
-  // copied to real ones upon becoming visible (ie. lazy loading)
+  // thumbnail image
   let image = document.createElement('img');
   image.setAttribute('width', 128);
   image.setAttribute('height', 128);
-  if('thumb' in info)
-    image.setAttribute('data-src', info.thumb.src);
+  image.setAttribute('src', info.thumb.src);
+  image.setAttribute('loading', 'lazy');
 
   // encompassing DIV element that holds the text content and the image
   let thumb = document.createElement('div');
@@ -87,21 +86,6 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementsByClassName('main')[0].append(thumb);
     });
 
-    // set up intersection observer instance and lazy loading code
-    let observer = new IntersectionObserver((entries, o) => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting) {
-          let t = entry.target.children[2];
-          o.unobserve(t);
-          if(t.hasAttribute('data-src'))
-            t.setAttribute('src', t.getAttribute('data-src'));
-        }
-      })
-    });
-
-    // set images for observing
-    let thumbs = main.querySelectorAll('div.th');
-    thumbs.forEach(t => observer.observe(t));
   });
 });
 
