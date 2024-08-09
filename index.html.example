@@ -1,0 +1,21 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <title>Gallery</title>
+  <link rel="stylesheet" type="text/css" href="gset.css" />
+  <script type="text/javascript" src="gset.js"></script>
+</head>
+
+<body>
+
+<div class="main">
+
+<p id="nojava" style="text-align:center">PLEASE ENABLE JAVASCRIPT</p>
+
+</div>
+
+</body>
+
+</html>
